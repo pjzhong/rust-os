@@ -1,31 +1,28 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(not(test), no_std)] //#![no_std]
+#![cfg_attr(not(test), no_main)] // instead of `#![no_main]`
+#![cfg_attr(test, allow(unused_imports))]
 
 use core::panic::PanicInfo;
+use rust_os::println;
+use rust_os::serial_println;
 
-mod vga_buffer;
-
+/// This function is called o panic
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
     loop {}
 }
 
-
-static HELLO: &[u8] = b"Hello ZJP!";
-
-#[no_mangle]
+/// This function is the entry point, since the linker looks for a function
+/// named `_start` by default
+#[cfg(not(test))]
+#[no_mangle] //don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
-   /* let vga_buffer = 0xb8000 as * mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }*/
-
-    println!("Hello World, I am {}", "zjp");
-    panic!("Some panic message");
+    println!("Hello World, I am {}", "zjp"); // write to vga, GUI
+    
+    // bootimage run -- -serial mod:stdio
+    // write to serial
+    serial_println!("Hello Host, I am {}", "zjp");
     loop {}
 }
