@@ -1,8 +1,11 @@
 #![cfg_attr(not(test), no_std)] // don't link the Rust standard library
+#![feature(abi_x86_interrupt)]
 
-//New: We needto add 'pub' here to make them accessible from the outside
+//New: We need to add 'pub' here to make them accessible from the outside
 pub mod vga_buffer;
 pub mod serial;
+pub mod interrupts;
+pub mod gdt;
 
 pub unsafe fn exit_qemu() {
     use x86_64::instructions::port::Port;

@@ -20,9 +20,29 @@ fn panic(info: &PanicInfo) -> ! {
 #[no_mangle] //don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
     println!("Hello World, I am {}", "zjp"); // write to vga, GUI
-    
+
+    rust_os::gdt::init();
+    rust_os::interrupts::init_idt();
+
+    fn stack_overflow() {
+        stack_overflow(); // for each recursion, the return address is pushed
+    }
+
+    // trigger a stack overflow
+    stack_overflow();
+
+    // trigger a page fault
+    //unsafe {
+    //    *(0xdeadbeef as *mut u64) = 42;
+    //}
+
+    // invoke a breakpoint exception
+    // x86_64::instructions::interrupts::int3();
+
     // bootimage run -- -serial mod:stdio
     // write to serial
-    serial_println!("Hello Host, I am {}", "zjp");
+    // serial_println!("Hello Host, I am {}", "zjp");
+
+    println!("It did not crash!");
     loop {}
 }
