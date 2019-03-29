@@ -19,17 +19,20 @@ fn panic(info: &PanicInfo) -> ! {
 #[cfg(not(test))]
 #[no_mangle] //don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
+    use rust_os::interrupts::PICS;
     println!("Hello World, I am {}", "zjp"); // write to vga, GUI
 
     rust_os::gdt::init();
     rust_os::interrupts::init_idt();
+    unsafe { PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
 
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
-    }
+    //    fn stack_overflow() {
+    //      stack_overflow(); // for each recursion, the return address is pushed
+    // }
 
     // trigger a stack overflow
-    stack_overflow();
+    // :tack_overflow();
 
     // trigger a page fault
     //unsafe {
