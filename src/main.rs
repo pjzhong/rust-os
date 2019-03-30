@@ -11,7 +11,7 @@ use rust_os::serial_println;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    rust_os::hlt_loop();
 }
 
 /// This function is the entry point, since the linker looks for a function
@@ -47,5 +47,5 @@ pub extern "C" fn _start() -> ! {
     // serial_println!("Hello Host, I am {}", "zjp");
 
     println!("It did not crash!");
-    loop {}
+    rust_os::hlt_loop();
 }
