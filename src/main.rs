@@ -4,7 +4,12 @@
 
 use core::panic::PanicInfo;
 use rust_os::println;
-use rust_os::serial_println;
+//use rust_os::{exit_qemu, serial_println};
+use bootloader::{BootInfo, entry_point};
+use x86_64::{structures::paging::PageTable, VirtAddr};
+
+// set the entry_point
+entry_point!(kernel_main);
 
 /// This function is called o panic
 #[cfg(not(test))]
@@ -18,7 +23,8 @@ fn panic(info: &PanicInfo) -> ! {
 /// named `_start` by default
 #[cfg(not(test))]
 #[no_mangle] //don't mangle the name of this function
-pub extern "C" fn _start() -> ! {
+//pub extern "C" fn _start() -> ! {*/
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use rust_os::interrupts::PICS;
     println!("Hello World, I am {}", "zjp"); // write to vga, GUI
 
@@ -44,7 +50,7 @@ pub extern "C" fn _start() -> ! {
 
     // bootimage run -- -serial mod:stdio
     // write to serial
-    // serial_println!("Hello Host, I am {}", "zjp");
+    // serial_println!("Hello Host, I am {}", "zjp")
 
     println!("It did not crash!");
     rust_os::hlt_loop();
