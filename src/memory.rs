@@ -23,13 +23,11 @@ pub fn init_frame_allocator(
         .iter()
         .filter(|r| r.region_type == MemoryRegionType::Usable);
     // map each region to its address range
-    let addr_ranges = regions.map(|r| r.range.start_addr()..r.range().end_addr());
+    let addr_ranges = regions.map(|r| r.range.start_addr()..r.range.end_addr());
     // transform to an iterator of frame start addresses
-    let frame_addresses = addr_ranges.flat_map(|r|. r.setp_by(4096));
+    let frame_addresses = addr_ranges.flat_map(|r| r.step_by(4096));
     // create `PhysFrame` type from the start addresses
-    let frames = frame_addresses.map(|addr| {
-        PhysFrame::containint_address(PhysAddr::new(addr))
-    });
+    let frames = frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)));
 
     BootInfoFrameAllocator { frames }
 }
@@ -46,6 +44,7 @@ unsafe fn active_level_4_table(physical_memory_offset: u64) -> &'static mut Page
     &mut *page_table_ptr
 }
 
+/// Creates an example mapping for the given pageto frame `0xb8000`.
 pub fn create_example_mapping(
     page: Page,
     mapper: &mut impl Mapper<Size4KiB>,
@@ -72,7 +71,7 @@ where
     I: Iterator<Item = PhysFrame>,
 {
     fn allocate_frame(&mut self) -> Option<PhysFrame> {
-        self.frames.next();
+        self.frames.next()
     }
 }
 
@@ -84,6 +83,7 @@ impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
     }
 }
 
+/// @Deprecated
 /// Translates the given virtual address to the mapped physical address,
 /// or `None` if the address is not mapped
 ///
